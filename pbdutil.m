@@ -2,17 +2,16 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id:$ */
+/* $Id: pbdutil.m,v 1.1 2003/04/10 13:13:08 rok Exp rok $ */
+
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
 
-typedef enum {in, out} inout;
-enum {get, set, list, help} what;
+//typedef enum {in, out} inout;
 void init();
-BOOL doOptions();
 void usage();
 void listTypes(NSPasteboard *pbs);
 BOOL setDataForPasteboard(NSPasteboard *pbs, NSString *type);
@@ -28,7 +27,7 @@ main(int argc, char *argv[])
     char sw;
     NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
     NSPasteboard *pbs = [NSPasteboard generalPasteboard];
-    inout ioDir = out;
+    enum {get, set, list, help} what = help;
     char *typename;
 
     init();	// setup pbTypes etc.
@@ -43,12 +42,10 @@ main(int argc, char *argv[])
 		break;
 	    case 'w':		// set data from stdin
 		what = set;
-		ioDir = in;
 		typename = strdup(optarg);
 		break;
 	    case 'r':		// specify type
 		what = get;
-		ioDir = out;
 		typename = strdup(optarg);
 		break;
 	    case 'v':
@@ -71,18 +68,29 @@ main(int argc, char *argv[])
 	case get:
 	case set:
 	    if((type = [pbTypes objectForKey:
-		    [NSString stringWithCString: typename]]) == nil){
-		usage();
-	    }
-	    if(type != nil){
-		if(ioDir == out){	// put data in pasteboard to stdout
+		    [NSString stringWithCString: typename]]) != nil){
+		if(what == get){	// put data in pasteboard to stdout
 		    t = [pbs dataForType: type];
-		    write(1, [t bytes], [t length]);
-		}else{			// read data from stdin and store it in pasetebnoard
+		    if(t != nil){
+			int l = [t length];
+			void *d = (void *)[t bytes];
+			while(l >= 0){
+			    write(1, d, l>256?256:l);
+			    d += 256;
+			    l -= 256;
+			}
+		    }
+		    else
+			exit (1);
+		}else{ // what == set
+		    // read data from stdin and store it in pasetebnoard
 		    if(!setDataForPasteboard(pbs, type)){
-			// error (do nothing)
+			;	// error (do nothing)
 		    };
 		}
+
+	    }else{
+		usage();
 	    }
 	    break;
 	default:
@@ -123,7 +131,7 @@ void usage()
 {
     NSEnumerator *ke = [pbTypes keyEnumerator];
     NSString *k;
-    printf("Usage:	pbdutil [-r type|-w type|-l]\n");
+    printf("Usage:	pbdutil [-r type|-w type|-l[ -v[ -v[ -v]]]]\n");
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
 	printf(" %s", [k cString]);
