@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.1 2003/04/10 13:13:08 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.2 2003/04/16 07:39:54 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -13,43 +13,45 @@
 //typedef enum {in, out} inout;
 void init();
 void usage();
-void listTypes(NSPasteboard *pbs);
-BOOL setDataForPasteboard(NSPasteboard *pbs, NSString *type);
+void listTypes(NSPasteboard *pbs, int verboseLevel);
+BOOL writeDataForType(NSPasteboard *pbs, char *typename);
+BOOL readDataForType(NSPasteboard *pbs, char *typename);
 
 NSDictionary *pbTypes;
-int verboseLevel = 0;
 
 int
 main(int argc, char *argv[])
 {
-    NSString *type = nil;
-    NSData *t;
-    char sw;
+    int verboseLevel = 0;
+    char *typename;
     NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
     NSPasteboard *pbs = [NSPasteboard generalPasteboard];
-    enum {get, set, list, help} what = help;
-    char *typename;
+    enum {get, set, list, help, none} what = none;
+    char sw;
 
     init();	// setup pbTypes etc.
 
-    while((sw = getopt(argc, argv, "vchlw:r:")) != -1){
+    while((sw = getopt(argc, argv, "vchlw:r:R:")) != -1){
 	switch(sw){
 	    case 'h':		// show help
 		what = help;
 		break;
-	    case 'l':		// list available types
+	    case 'l':		// list available types and information
 		what = list;
 		break;
-	    case 'w':		// set data from stdin
+	    case 'w':		// write to pasteboard
 		what = set;
 		typename = strdup(optarg);
 		break;
-	    case 'r':		// specify type
+	    case 'r':		// read from pasteboard
 		what = get;
 		typename = strdup(optarg);
 		break;
 	    case 'v':
 		verboseLevel += 1;
+		break;
+	    case 'R':		// read every data from pasteboard
+		// *** NOT YET IMPLEMENTED ***
 		break;
 	    default:
 		break;
@@ -62,38 +64,17 @@ main(int argc, char *argv[])
 	case help:
 	    usage();
 	    break;
-	case list:
-	    listTypes(pbs);
-	    break;
 	case get:
-	case set:
-	    if((type = [pbTypes objectForKey:
-		    [NSString stringWithCString: typename]]) != nil){
-		if(what == get){	// put data in pasteboard to stdout
-		    t = [pbs dataForType: type];
-		    if(t != nil){
-			int l = [t length];
-			void *d = (void *)[t bytes];
-			while(l >= 0){
-			    write(1, d, l>256?256:l);
-			    d += 256;
-			    l -= 256;
-			}
-		    }
-		    else
-			exit (1);
-		}else{ // what == set
-		    // read data from stdin and store it in pasetebnoard
-		    if(!setDataForPasteboard(pbs, type)){
-			;	// error (do nothing)
-		    };
-		}
-
-	    }else{
-		usage();
-	    }
+	    if(readDataForType(pbs, typename) != YES)
+		usage();	// TYPE typename not exists
 	    break;
+	case set:
+	    if(writeDataForType(pbs, typename) != YES)
+		usage();	// TYPE typename not exists
+	    break;
+	case list:
 	default:
+	    listTypes(pbs, verboseLevel);
 	    break;
     }
 
@@ -141,7 +122,7 @@ void usage()
 }
 
 void
-listTypes(NSPasteboard *pbs)
+listTypes(NSPasteboard *pbs, int verboseLevel)
 {
     NSString *t, *k;
     NSEnumerator *ke;
@@ -149,54 +130,85 @@ listTypes(NSPasteboard *pbs)
     NSEnumerator *en = [types objectEnumerator];
 
     printf("Available type(s):");
-    switch(verboseLevel){
-	case 0:
-	case 1:
-	case 2:
-	    while((t = [en nextObject]) != nil){
-		ke = [pbTypes keyEnumerator];	// supported types
-		while((k = [ke nextObject]) != nil){
-		    if([(NSString *)t isEqualToString: (NSString *)[pbTypes objectForKey: k]]){
-			if(verboseLevel <= 0){
-			    printf("\t%s", (char *)[k cString]);
-			}else if(verboseLevel >= 1){
-			    printf("\n\t%s (%s)", (char *)[k cString],
-				    [[t description] cString]);
-			}
-			if(verboseLevel >= 2){
-			    printf(" (size: %d bytes)",
-				[[pbs dataForType: t] length]);
-			}
+    while((t = [en nextObject]) != nil){
+	ke = [pbTypes keyEnumerator];	// supported types
+	if(verboseLevel <= 2){
+	    while((k = [ke nextObject]) != nil){
+		if([(NSString *)t isEqualToString: (NSString *)[pbTypes objectForKey: k]]){
+		    if(verboseLevel <= 0){
+			printf("\t%s", (char *)[k cString]);
+		    }else if(verboseLevel >= 1){
+			printf("\n\t%s (%s)", (char *)[k cString],
+				[[t description] cString]);
+		    }
+		    if(verboseLevel >= 2){
+			printf(" (size: %d bytes)",
+			    [[pbs dataForType: t] length]);
 		    }
 		}
 	    }
-	    break;
-	default:	// verboseLevel >= 3
-	    // show more detail about available types
-	    while((t = [en nextObject]) != nil){
-		printf("\n\t%s (size: %d)", [[t description] cString],
-			[[pbs dataForType: t] length]);
-	    }
-	    break;
+	}else{	// verboseLevel >= 3
+	    printf("\n\t%s (size: %d)", [[t description] cString],
+		    [[pbs dataForType: t] length]);
+	}
     }
     printf("\n");
 }
 
 BOOL
-setDataForPasteboard(NSPasteboard *pbs, NSString *type)
+readDataForType(NSPasteboard *pbs, char *typename)
 {
-    NSMutableData *data = [NSMutableData dataWithLength: 0];
-    char buffer[256];
-    int l;
+    NSString *type;
 
-    while((l = read(0, buffer, 256)) > 0){
-	[data appendBytes: buffer length: l];
-    }
-    if(l < 0){		// read error
-	perror("Read error: ");
+    if((type = [pbTypes objectForKey:
+	    [NSString stringWithCString: typename]]) != nil){
+	NSData *t = [pbs dataForType: type];
+	if(t != nil){	// t should not be nil
+	    int l = [t length];
+	    void *d = (void *)[t bytes];
+	    while(l >= 0){
+		write(1, d, l>256?256:l);
+		d += 256;
+		l -= 256;
+	    }
+	}
+    }else{
 	return NO;
     }
-    [pbs declareTypes: [NSArray arrayWithObject: type] owner: nil];
-    [pbs setData: data forType: type];
+    return YES;
+}
+
+BOOL
+writeDataForType(NSPasteboard *pbs, char *typename)
+{
+    int l;
+    char buffer[256];
+    NSString *type;
+    NSMutableData *data = [NSMutableData dataWithLength: 0];
+#if DEBUG > 1
+    int readCount = 0;
+#endif
+
+    if((type = [pbTypes objectForKey:
+	    [NSString stringWithCString: typename]]) != nil){
+	while((l = read(0, buffer, 256)) > 0){
+	    [data appendBytes: buffer length: l];
+#if DEBUG > 1
+	    readCount += l;
+#endif
+	}
+	if(l < 0){		// read error
+	    perror("Read error: ");
+	    return NO;
+	}
+#if DEBUG > 1
+	fprintf(stderr, "%d bytes read.\n", 
+#endif
+	[pbs declareTypes: [NSArray arrayWithObject: type] owner: nil];
+	[pbs setData: data forType: type];
+    }else{
+    	return NO;
+    }
+
     return YES;
 }
