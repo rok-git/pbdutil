@@ -1,0 +1,71 @@
+.\" $Id
+.\"
+.Dd -
+.Dt PBDUTIL 1
+.Os "Mac OS X"
+.Sh NAME
+.Nm pbdutil
+.Nd read and write the Pasteboard
+.Sh SYNOPSIS
+.Nm
+.Op Fl n Ar name
+.Op Fl r Ar type | Fl w Ar type
+.Nm
+.Op Fl n Ar name
+.Op Fl l Op Fl v Op Fl v Op Fl v
+.Nm
+.Op Fl n Ar name
+.Op Fl c
+.Sh DESCRIPTION
+The
+.Nm
+read and write content of the Pasteboard.  When reading from the Pasteboard,
+content of specified type is written on stdout.  When writing
+Pasteboard, data should be given via stdin.  It also display information
+about what the Pasteboard has.
+.Pp
+The following options are available:
+.Bl -tag -width Ds
+.It Fl n Ar name
+Use a private pasteboard named 
+.Ar name
+instead of general (standard) pasteboard.  If there is no pasteboard with 
+given name, one will be created.
+.It Fl r Ar type
+Read data from the Pasteboard and write them to stdout.  Available 
+.Ar types
+are text, rtf, tiff, pict, pdf.
+.It Fl w Ar type
+Read data from stdin and write them out to Pasteboard.  
+.Ar Type
+and the data must match.
+.It Fl l Op Fl v Op Fl v Op Fl v
+List contents of Pasteboard briefly.  More 
+.Fl v
+make the result more specific.
+.It Fl c 
+Clear content of pasteboard.
+.\" .Sh IMPLEMENTATION NOTES
+.Sh EXAMPLES
+To read and write data in Pasteboard: 
+.Pp
+.Dl "pbdutil -r tiff > /tmp/a.tiff"
+.Dl "pabutil -w text < /etc/hosts
+.Pp
+To clear data in the Pasteboard:
+.Pp
+.Dl "pbdutil -c"
+.Sh BUGS
+There is no way to know private pastebords' names.
+
+More than one type of data cannot be stored into Pasteboard.  For example,
+when you copy a page from Safari, then Pasteboard contains both text and rtf
+data.  But you cannot store both text and rtf data using pbdutil.  You can 
+store only one type of data using pbdutil. 
+
+Private pasteboard created by issuing 'pbdutil -n name' cannot be removed.
+'pbdutil -n name -c' only clear the contents of the pasteboard.
+
+.Sh SEE ALSO
+
+.Sh AUTHOR
