@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.4 2003/07/23 03:04:36 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.5 2003/08/04 08:11:14 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -24,15 +24,15 @@ int
 main(int argc, char *argv[])
 {
     int verboseLevel = 0;
-    char *typename;
+    char *typename = NULL;
     NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
-    NSPasteboard *pbd = [NSPasteboard generalPasteboard];
+    NSPasteboard *pbd = nil;
     enum {get, set, list, help, clear, none} what = none;
     char sw;
 
     init();	// setup pbTypes etc.
 
-    while((sw = getopt(argc, argv, "vchlw:r:R:")) != -1){
+    while((sw = getopt(argc, argv, "vchlw:r:R:n:")) != -1){
 	switch(sw){
 	    case 'h':		// show help
 		what = help;
@@ -57,12 +57,19 @@ main(int argc, char *argv[])
 	    case 'R':		// read every data from pasteboard
 		// *** NOT YET IMPLEMENTED ***
 		break;
+	    case 'n':
+		pbd = [NSPasteboard pasteboardWithName:
+			    [NSString stringWithCString: optarg]];
+		break;
 	    default:
 		break;
 	}
     }
     argc -= optind;
     argv += optind;
+
+    if(pbd == nil)
+	pbd  = [NSPasteboard generalPasteboard];
 
     switch(what){
 	case help:
@@ -86,6 +93,7 @@ main(int argc, char *argv[])
     }
 
     [arp release];
+    free(typename);
     return 0;
 }
 
@@ -101,7 +109,7 @@ init()
 		NSPICTPboardType,
 		NSHTMLPboardType,
 		NSRTFPboardType,
-		NSRTFDPboardType,
+//		NSRTFDPboardType,
 		NSTabularTextPboardType,
 		nil]
 	forKeys:
@@ -112,7 +120,7 @@ init()
 		@"pict",
 		@"html",
 		@"rtf",
-		@"rtfd",
+//		@"rtfd",
 		@"tab",
 		nil]];
 }
@@ -121,7 +129,7 @@ void usage()
 {
     NSEnumerator *ke = [pbTypes keyEnumerator];
     NSString *k;
-    printf("Usage:	pbdutil [-r type|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
+    printf("Usage:	pbdutil [-n name] [-r type|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
 	printf(" %s", [k cString]);
@@ -228,6 +236,19 @@ writeDataForType(NSPasteboard *pbd, char *typename)
 void
 pbdclear(NSPasteboard *pbd)
 {
-    (void)[pbd declareTypes: nil owner: nil];
+    NSString *nm = [pbd name];
+    if([nm isEqualToString: NSGeneralPboard]
+	|| [nm isEqualToString: NSFontPboard]
+	|| [nm isEqualToString: NSRulerPboard]
+	|| [nm isEqualToString: NSFindPboard]
+	|| [nm isEqualToString: NSDragPboard]){
+	(void)[pbd declareTypes: nil owner: nil];
+    }else{
+#if DEBUG > 1
+	NSLog(@"funga-\n");
+#endif
+	(void)[pbd declareTypes: nil owner: nil];
+	(void)[pbd releaseGlobally];
+    }
     return;
 }
