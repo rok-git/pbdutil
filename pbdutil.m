@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.2 2003/04/16 07:39:54 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.3 2003/05/04 00:56:59 rok Exp $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -16,6 +16,7 @@ void usage();
 void listTypes(NSPasteboard *pbs, int verboseLevel);
 BOOL writeDataForType(NSPasteboard *pbs, char *typename);
 BOOL readDataForType(NSPasteboard *pbs, char *typename);
+void pbdclear(NSPasteboard *pbs);
 
 NSDictionary *pbTypes;
 
@@ -26,7 +27,7 @@ main(int argc, char *argv[])
     char *typename;
     NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
     NSPasteboard *pbs = [NSPasteboard generalPasteboard];
-    enum {get, set, list, help, none} what = none;
+    enum {get, set, list, help, clear, none} what = none;
     char sw;
 
     init();	// setup pbTypes etc.
@@ -46,6 +47,9 @@ main(int argc, char *argv[])
 	    case 'r':		// read from pasteboard
 		what = get;
 		typename = strdup(optarg);
+		break;
+	    case 'c':		// clear pasteboard
+		what = clear;
 		break;
 	    case 'v':
 		verboseLevel += 1;
@@ -72,6 +76,9 @@ main(int argc, char *argv[])
 	    if(writeDataForType(pbs, typename) != YES)
 		usage();	// TYPE typename not exists
 	    break;
+	case clear:
+	    pbdclear(pbs);
+	    break;
 	case list:
 	default:
 	    listTypes(pbs, verboseLevel);
@@ -94,6 +101,7 @@ init()
 		NSPICTPboardType,
 		NSHTMLPboardType,
 		NSRTFPboardType,
+		NSRTFDPboardType,
 		NSTabularTextPboardType,
 		nil]
 	forKeys:
@@ -104,6 +112,7 @@ init()
 		@"pict",
 		@"html",
 		@"rtf",
+		@"rtfd",
 		@"tab",
 		nil]];
 }
@@ -112,7 +121,7 @@ void usage()
 {
     NSEnumerator *ke = [pbTypes keyEnumerator];
     NSString *k;
-    printf("Usage:	pbdutil [-r type|-w type|-l[ -v[ -v[ -v]]]]\n");
+    printf("Usage:	pbdutil [-r type|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
 	printf(" %s", [k cString]);
@@ -155,6 +164,7 @@ listTypes(NSPasteboard *pbs, int verboseLevel)
     printf("\n");
 }
 
+// write data in Pasteboard to stdout
 BOOL
 readDataForType(NSPasteboard *pbs, char *typename)
 {
@@ -178,6 +188,7 @@ readDataForType(NSPasteboard *pbs, char *typename)
     return YES;
 }
 
+// read data from stdin and write to Pasteboard
 BOOL
 writeDataForType(NSPasteboard *pbs, char *typename)
 {
@@ -211,4 +222,12 @@ writeDataForType(NSPasteboard *pbs, char *typename)
     }
 
     return YES;
+}
+
+
+void
+pbdclear(NSPasteboard *pbs)
+{
+    (void)[pbs declareTypes: nil owner: nil];
+    return;
 }
