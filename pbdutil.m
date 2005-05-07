@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.5 2003/08/04 08:11:14 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.6 2005/01/08 07:51:33 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -93,7 +93,8 @@ main(int argc, char *argv[])
     }
 
     [arp release];
-    free(typename);
+    if(typename)
+	free(typename);
     return 0;
 }
 
@@ -245,7 +246,7 @@ pbdclear(NSPasteboard *pbd)
 	(void)[pbd declareTypes: nil owner: nil];
     }else{
 #if DEBUG > 1
-	NSLog(@"funga-\n");
+	NSLog(@"Clear Private Pasteboard: %s\n", [nm cString]);
 #endif
 	(void)[pbd declareTypes: nil owner: nil];
 	(void)[pbd releaseGlobally];
