@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.6 2005/01/08 07:51:33 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.7 2005/05/07 06:55:36 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -16,6 +16,7 @@ void usage();
 void listTypes(NSPasteboard *pbd, int verboseLevel);
 BOOL writeDataForType(NSPasteboard *pbd, char *typename);
 BOOL readDataForType(NSPasteboard *pbd, char *typename);
+BOOL readRTFD(NSPasteboard *pbd, char *path);
 void pbdclear(NSPasteboard *pbd);
 
 NSDictionary *pbTypes;
@@ -25,6 +26,7 @@ main(int argc, char *argv[])
 {
     int verboseLevel = 0;
     char *typename = NULL;
+    char *output = NULL;
     NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
     NSPasteboard *pbd = nil;
     enum {get, set, list, help, clear, none} what = none;
@@ -32,7 +34,7 @@ main(int argc, char *argv[])
 
     init();	// setup pbTypes etc.
 
-    while((sw = getopt(argc, argv, "vchlw:r:R:n:")) != -1){
+    while((sw = getopt(argc, argv, "vchlw:r:R:n:o:")) != -1){
 	switch(sw){
 	    case 'h':		// show help
 		what = help;
@@ -61,6 +63,9 @@ main(int argc, char *argv[])
 		pbd = [NSPasteboard pasteboardWithName:
 			    [NSString stringWithCString: optarg]];
 		break;
+	    case 'o':
+		output = strdup(optarg);
+		break;
 	    default:
 		break;
 	}
@@ -76,8 +81,13 @@ main(int argc, char *argv[])
 	    usage();
 	    break;
 	case get:
-	    if(readDataForType(pbd, typename) != YES)
-		usage();	// TYPE typename not exists
+	    if(!strcmp(typename, "rtfd")){
+		if((output == NULL) || (readRTFD(pbd, output) != YES))
+			usage();
+	    }else{
+		if(readDataForType(pbd, typename) != YES)
+		    usage();	// TYPE typename not exists
+	    }
 	    break;
 	case set:
 	    if(writeDataForType(pbd, typename) != YES)
@@ -110,8 +120,10 @@ init()
 		NSPICTPboardType,
 		NSHTMLPboardType,
 		NSRTFPboardType,
-//		NSRTFDPboardType,
+		NSRTFDPboardType,
 		NSTabularTextPboardType,
+		NSURLPboardType,
+		NSFilenamesPboardType,
 		nil]
 	forKeys:
 	    [NSArray arrayWithObjects:
@@ -121,8 +133,10 @@ init()
 		@"pict",
 		@"html",
 		@"rtf",
-//		@"rtfd",
+		@"rtfd",
 		@"tab",
+		@"url",
+		@"path",
 		nil]];
 }
 
@@ -130,7 +144,7 @@ void usage()
 {
     NSEnumerator *ke = [pbTypes keyEnumerator];
     NSString *k;
-    printf("Usage:	pbdutil [-n name] [-r type|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
+    printf("Usage:	pbdutil [-n name] [-r type|-r rtfd -o FILE|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
 	printf(" %s", [k cString]);
@@ -196,6 +210,18 @@ readDataForType(NSPasteboard *pbd, char *typename)
     }
     return YES;
 }
+
+
+BOOL
+readRTFD(NSPasteboard *pbd, char *path){
+    NSString *type = [pbTypes objectForKey: @"rtfd"]; 
+    NSData *t = [pbd dataForType: type];
+    NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: t];
+    return [fw writeToFile: [NSString stringWithCString: path]
+	       atomically: YES
+	       updateFilenames: YES];
+}
+
 
 // read data from stdin and write to Pasteboard
 BOOL
