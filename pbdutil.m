@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.7 2005/05/07 06:55:36 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.8 2007/01/23 08:20:59 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -10,13 +10,17 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+#define NORTFD
+
 //typedef enum {in, out} inout;
 void init();
 void usage();
 void listTypes(NSPasteboard *pbd, int verboseLevel);
 BOOL writeDataForType(NSPasteboard *pbd, char *typename);
 BOOL readDataForType(NSPasteboard *pbd, char *typename);
+#ifndef NORTFD
 BOOL readRTFD(NSPasteboard *pbd, char *path);
+#endif
 void pbdclear(NSPasteboard *pbd);
 
 NSDictionary *pbTypes;
@@ -81,13 +85,17 @@ main(int argc, char *argv[])
 	    usage();
 	    break;
 	case get:
+#ifndef NORTFD
 	    if(!strcmp(typename, "rtfd")){
 		if((output == NULL) || (readRTFD(pbd, output) != YES))
 			usage();
 	    }else{
+#endif
 		if(readDataForType(pbd, typename) != YES)
 		    usage();	// TYPE typename not exists
+#ifndef NORTFD
 	    }
+#endif
 	    break;
 	case set:
 	    if(writeDataForType(pbd, typename) != YES)
@@ -144,7 +152,11 @@ void usage()
 {
     NSEnumerator *ke = [pbTypes keyEnumerator];
     NSString *k;
+#ifndef NORTFD
     printf("Usage:	pbdutil [-n name] [-r type|-r rtfd -o FILE|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
+#else
+    printf("Usage:	pbdutil [-n name] [-r type|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
+#endif
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
 	printf(" %s", [k cString]);
@@ -212,15 +224,18 @@ readDataForType(NSPasteboard *pbd, char *typename)
 }
 
 
+#ifndef NORTFD
 BOOL
 readRTFD(NSPasteboard *pbd, char *path){
     NSString *type = [pbTypes objectForKey: @"rtfd"]; 
     NSData *t = [pbd dataForType: type];
     NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: t];
+    [fw autorelease];
     return [fw writeToFile: [NSString stringWithCString: path]
 	       atomically: YES
 	       updateFilenames: YES];
 }
+#endif
 
 
 // read data from stdin and write to Pasteboard
