@@ -11,10 +11,25 @@
 
 #define BUFFSIZE 256
 
+NSAutoreleasePool *arp;
+
+void
+initialize()
+{
+    arp = [[NSAutoreleasePool alloc] init];
+}
+
+void
+finalize()
+{
+    [arp release];
+}
+
 void
 usage(char *n)
 {
   printf("Usage: %s FILENAME\n", n);
+  finalize();
   exit(1);
 }
 
@@ -24,12 +39,13 @@ main(int argc, char *argv[])
   unsigned char buffer[BUFFSIZE];
   size_t len;
   int ret;
+
+  initialize();
   
   if(argc != 2){
     usage(argv[0]);
   }
 
-  NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
   NSMutableData *data = [[NSMutableData alloc] init];
 
   while((len = read(0, buffer, BUFFSIZE))){
@@ -44,6 +60,7 @@ main(int argc, char *argv[])
   
   [fw release];
   [data release];
-  [arp release];
+
+  finalize();
   return ret;
 }
