@@ -2,7 +2,7 @@
 /* Utility to make Wrapped Files out of data from stdin */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2007 by CHOI Kyong-Rok */
-/* $Id: */
+/* $Id: $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
