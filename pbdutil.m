@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.8 2007/01/23 08:20:59 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.9 2007/01/26 10:19:40 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -159,7 +159,7 @@ void usage()
 #endif
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
-	printf(" %s", [k cString]);
+	printf(" %s", [k UTF8String]);
     }
     printf(")\n");
     exit(1);
@@ -180,10 +180,10 @@ listTypes(NSPasteboard *pbd, int verboseLevel)
 	    while((k = [ke nextObject]) != nil){
 		if([(NSString *)t isEqualToString: (NSString *)[pbTypes objectForKey: k]]){
 		    if(verboseLevel <= 0){
-			printf("\t%s", (char *)[k cString]);
+			printf("\t%s", (char *)[k UTF8String]);
 		    }else if(verboseLevel >= 1){
-			printf("\n\t%s (%s)", (char *)[k cString],
-				[[t description] cString]);
+			printf("\n\t%s (%s)", (char *)[k UTF8String],
+				[t UTF8String]);
 		    }
 		    if(verboseLevel >= 2){
 			printf(" (size: %d bytes)",
@@ -192,8 +192,7 @@ listTypes(NSPasteboard *pbd, int verboseLevel)
 		}
 	    }
 	}else{	// verboseLevel >= 3
-	    printf("\n\t%s (size: %d)", [[t description] cString],
-		    [[pbd dataForType: t] length]);
+	    printf("\n\t%s (size: %d)", [t UTF8String], [[pbd dataForType: t] length]);
 	}
     }
     printf("\n");
@@ -287,7 +286,7 @@ pbdclear(NSPasteboard *pbd)
 	(void)[pbd declareTypes: nil owner: nil];
     }else{
 #if DEBUG > 1
-	NSLog(@"Clear Private Pasteboard: %s\n", [nm cString]);
+	NSLog(@"Clear Private Pasteboard: %s\n", [nm UTF8String]);
 #endif
 	(void)[pbd declareTypes: nil owner: nil];
 	(void)[pbd releaseGlobally];
