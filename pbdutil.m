@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.9 2007/01/26 10:19:40 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.11 2008/03/09 07:55:31 rok Exp $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -22,6 +22,7 @@ BOOL readDataForType(NSPasteboard *pbd, char *typename);
 BOOL readRTFD(NSPasteboard *pbd, char *path);
 #endif
 void pbdclear(NSPasteboard *pbd);
+void pbdcount(NSPasteboard *pbd, int verboseLevel);
 
 NSDictionary *pbTypes;
 
@@ -33,12 +34,12 @@ main(int argc, char *argv[])
     char *output = NULL;
     NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
     NSPasteboard *pbd = nil;
-    enum {get, set, list, help, clear, none} what = none;
+    enum {get, set, list, help, clear, count, getNth, none} what = none;
     char sw;
 
     init();	// setup pbTypes etc.
 
-    while((sw = getopt(argc, argv, "vchlw:r:R:n:o:")) != -1){
+    while((sw = getopt(argc, argv, "vcChlw:r:R:n:o:")) != -1){
 	switch(sw){
 	    case 'h':		// show help
 		what = help;
@@ -57,11 +58,15 @@ main(int argc, char *argv[])
 	    case 'c':		// clear pasteboard
 		what = clear;
 		break;
+	    case 'C':		// count the types of contents
+		what = count;
+		break;
 	    case 'v':
 		verboseLevel += 1;
 		break;
-	    case 'R':		// read every data from pasteboard
+	    case 'R':		// read n-th data from pasteboard
 		// *** NOT YET IMPLEMENTED ***
+		what = getNth;
 		break;
 	    case 'n':
 		pbd = [NSPasteboard pasteboardWithName:
@@ -104,7 +109,11 @@ main(int argc, char *argv[])
 	case clear:
 	    pbdclear(pbd);
 	    break;
-	case list:
+	case count:
+	    pbdcount(pbd, verboseLevel);
+	    break;
+	case getNth:		// NOT YET IMPLREMENTED
+	case list:		// Default Action
 	default:
 	    listTypes(pbd, verboseLevel);
 	    break;
@@ -132,6 +141,7 @@ init()
 		NSTabularTextPboardType,
 		NSURLPboardType,
 		NSFilenamesPboardType,
+		NSFontPboardType,
 		nil]
 	forKeys:
 	    [NSArray arrayWithObjects:
@@ -145,6 +155,7 @@ init()
 		@"tab",
 		@"url",
 		@"path",
+		@"font",
 		nil]];
 }
 
@@ -162,6 +173,7 @@ void usage()
 	printf(" %s", [k UTF8String]);
     }
     printf(")\n");
+    printf("	pbdutil -C\n");
     exit(1);
 }
 
@@ -210,10 +222,16 @@ readDataForType(NSPasteboard *pbd, char *typename)
 	if(t != nil){	// t should not be nil
 	    int l = [t length];
 	    void *d = (void *)[t bytes];
-	    while(l >= 0){
-		write(1, d, l>256?256:l);
-		d += 256;
-		l -= 256;
+	    int c = 0;
+	    while(l > 0){
+		c = write(1, d, l>256?256:l);
+		if(c>=0){
+		    d += c;
+		    l -= c;
+		}else{
+		    // write(2) failed
+		    exit(-1);
+		}
 	    }
 	}
     }else{
@@ -273,7 +291,6 @@ writeDataForType(NSPasteboard *pbd, char *typename)
     return YES;
 }
 
-
 void
 pbdclear(NSPasteboard *pbd)
 {
@@ -292,4 +309,13 @@ pbdclear(NSPasteboard *pbd)
 	(void)[pbd releaseGlobally];
     }
     return;
+}
+
+void
+pbdcount(NSPasteboard *pbd, int verboseLevel)
+{
+    printf("%d", [[pbd types] count]);
+    if(verboseLevel > 0)
+       printf(" types are available");	
+    printf("\n");
 }
