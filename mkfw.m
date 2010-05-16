@@ -2,7 +2,7 @@
 /* Utility to make Wrapped Files out of data from stdin */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2007 by CHOI Kyong-Rok */
-/* $Id: $ */
+/* $Id: mkfw.m,v 1.3 2007/01/29 12:56:56 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 
   NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: data];
 
-  ret = [fw writeToFile: [NSString stringWithCString: argv[1]]
+  ret = [fw writeToFile: [NSString stringWithUTF8String: argv[1]]
 	    atomically: YES
 	    updateFilenames: YES];
   
