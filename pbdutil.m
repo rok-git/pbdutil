@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.11 2008/03/09 07:55:31 rok Exp $ */
+/* $Id: pbdutil.m,v 1.11 2009/03/13 08:47:30 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -70,7 +70,7 @@ main(int argc, char *argv[])
 		break;
 	    case 'n':
 		pbd = [NSPasteboard pasteboardWithName:
-			    [NSString stringWithCString: optarg]];
+			    [NSString stringWithUTF8String: optarg]];
 		break;
 	    case 'o':
 		output = strdup(optarg);
@@ -217,7 +217,7 @@ readDataForType(NSPasteboard *pbd, char *typename)
     NSString *type;
 
     if((type = [pbTypes objectForKey:
-	    [NSString stringWithCString: typename]]) != nil){
+	    [NSString stringWithUTF8String: typename]]) != nil){
 	NSData *t = [pbd dataForType: type];
 	if(t != nil){	// t should not be nil
 	    int l = [t length];
@@ -248,7 +248,7 @@ readRTFD(NSPasteboard *pbd, char *path){
     NSData *t = [pbd dataForType: type];
     NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: t];
     [fw autorelease];
-    return [fw writeToFile: [NSString stringWithCString: path]
+    return [fw writeToFile: [NSString stringWithUTF8String: path]
 	       atomically: YES
 	       updateFilenames: YES];
 }
@@ -268,7 +268,7 @@ writeDataForType(NSPasteboard *pbd, char *typename)
 #endif
 
     if((type = [pbTypes objectForKey:
-	    [NSString stringWithCString: typename]]) != nil){
+	    [NSString stringWithUTF8String: typename]]) != nil){
 	while((l = read(0, buffer, 256)) > 0){
 	    [data appendBytes: buffer length: l];
 #if DEBUG > 1
