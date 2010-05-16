@@ -1,4 +1,4 @@
-.\" $Id: pbdutil.1,v 1.2 2005/01/09 00:58:17 rok Exp $
+.\" $Id: pbdutil.1,v 1.3 2005/05/07 06:55:31 rok Exp rok $
 .\"
 .Dd -
 .Dt PBDUTIL 1
@@ -10,6 +10,9 @@
 .Nm
 .Op Fl n Ar name
 .Op Fl r Ar type | Fl w Ar type
+.Nm
+.Op Fl n Ar name
+.Op Fl r Ar rtfd FILE.rtfd 
 .Nm
 .Op Fl n Ar name
 .Op Fl l Op Fl v Op Fl v Op Fl v
@@ -27,7 +30,7 @@ about what the Pasteboard has.
 Following options are available:
 .Bl -tag -width Ds
 .It Fl n Ar name
-Use a private pasteboard named 
+Use a private pasteboard named as
 .Ar name
 instead of general (standard) pasteboard.  If there is no pasteboard with 
 given name, one will be created.
@@ -45,6 +48,9 @@ List contents of Pasteboard briefly.  More
 make the result more specific.
 .It Fl c 
 Clear content of pasteboard.
+.El
+.Pp
+mkfw is a companion program that make rtfd structured directory from the output of pbdutil.  If the Pasteboard contains data of RTFD type, you can use mkfw.
 .\" .Sh IMPLEMENTATION NOTES
 .Sh EXAMPLES
 To read and write data in Pasteboard: 
@@ -55,18 +61,21 @@ To read and write data in Pasteboard:
 To clear data in the Pasteboard:
 .Pp
 .Dl "pbdutil -c"
+.Pp
+To make rtfd structured directory that can be opend with TextEdit.app:
+.Pp
+.Dl "pbdutil -r rtfd | mkfw FILE.rtfd"
 .Sh BUGS
 There is no way to know private pastebords' names.
-
 More than one type of data cannot be stored into Pasteboard.  For example,
 when you copy a page from Safari, then Pasteboard contains both text and rtf
 data.  But you cannot store both text and rtf data using pbdutil.  You can 
 store only one type of data using pbdutil. 
-
+.Pp
 Private pasteboard created by issuing 'pbdutil -n name' cannot be removed.
-'pbdutil -n name -c' only clear the contents of the pasteboard.
-
+\'pbdutil -n name -c' only clears the contents of the pasteboard.
 .Sh SEE ALSO
-
+.Pp
+pbpaste(1), pbcopy(1)
 .Sh AUTHOR
 CHOI Kyong-Rok.
