@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.11 2009/03/13 08:47:30 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.12 2010/05/16 02:41:08 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -198,13 +198,13 @@ listTypes(NSPasteboard *pbd, int verboseLevel)
 				[t UTF8String]);
 		    }
 		    if(verboseLevel >= 2){
-			printf(" (size: %d bytes)",
-			    [[pbd dataForType: t] length]);
+			printf(" (size: %lu bytes)",
+			    (unsigned long)[[pbd dataForType: t] length]);
 		    }
 		}
 	    }
 	}else{	// verboseLevel >= 3
-	    printf("\n\t%s (size: %d)", [t UTF8String], [[pbd dataForType: t] length]);
+	    printf("\n\t%s (size: %lu)", [t UTF8String], (unsigned long)[[pbd dataForType: t] length]);
 	}
     }
     printf("\n");
@@ -314,7 +314,7 @@ pbdclear(NSPasteboard *pbd)
 void
 pbdcount(NSPasteboard *pbd, int verboseLevel)
 {
-    printf("%d", [[pbd types] count]);
+    printf("%lu", (unsigned long)[[pbd types] count]);
     if(verboseLevel > 0)
        printf(" types are available");	
     printf("\n");
