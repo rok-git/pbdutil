@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.12 2010/05/16 02:41:08 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.13 2011/04/24 11:51:23 rok Exp rok $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -18,6 +18,7 @@ void usage();
 void listTypes(NSPasteboard *pbd, int verboseLevel);
 BOOL writeDataForType(NSPasteboard *pbd, char *typename);
 BOOL readDataForType(NSPasteboard *pbd, char *typename);
+BOOL readNthData(NSPasteboard *pbd, int n);
 #ifndef NORTFD
 BOOL readRTFD(NSPasteboard *pbd, char *path);
 #endif
@@ -36,6 +37,7 @@ main(int argc, char *argv[])
     NSPasteboard *pbd = nil;
     enum {get, set, list, help, clear, count, getNth, none} what = none;
     char sw;
+    int nth;
 
     init();	// setup pbTypes etc.
 
@@ -67,6 +69,7 @@ main(int argc, char *argv[])
 	    case 'R':		// read n-th data from pasteboard
 		// *** NOT YET IMPLEMENTED ***
 		what = getNth;
+		nth = atoi(optarg);
 		break;
 	    case 'n':
 		pbd = [NSPasteboard pasteboardWithName:
@@ -113,6 +116,8 @@ main(int argc, char *argv[])
 	    pbdcount(pbd, verboseLevel);
 	    break;
 	case getNth:		// NOT YET IMPLREMENTED
+	    readNthData(pbd, nth);
+	    break;
 	case list:		// Default Action
 	default:
 	    listTypes(pbd, verboseLevel);
@@ -184,6 +189,7 @@ listTypes(NSPasteboard *pbd, int verboseLevel)
     NSEnumerator *ke;
     NSArray *types = [pbd types];
     NSEnumerator *en = [types objectEnumerator];
+    int i = 1;
 
     printf("Available type(s):");
     while((t = [en nextObject]) != nil){
@@ -196,15 +202,16 @@ listTypes(NSPasteboard *pbd, int verboseLevel)
 		    }else if(verboseLevel >= 1){
 			printf("\n\t%s (%s)", (char *)[k UTF8String],
 				[t UTF8String]);
-		    }
-		    if(verboseLevel >= 2){
-			printf(" (size: %lu bytes)",
-			    (unsigned long)[[pbd dataForType: t] length]);
+			if(verboseLevel >= 2){
+			    printf(" (size: %lu bytes)",
+				(unsigned long)[[pbd dataForType: t] length]);
+			}
 		    }
 		}
 	    }
 	}else{	// verboseLevel >= 3
-	    printf("\n\t%s (size: %lu)", [t UTF8String], (unsigned long)[[pbd dataForType: t] length]);
+		// list all types including non-supported types
+	    printf("\n\t%2d: %s (size: %lu)", i++, [t UTF8String], (unsigned long)[[pbd dataForType: t] length]);
 	}
     }
     printf("\n");
@@ -240,6 +247,35 @@ readDataForType(NSPasteboard *pbd, char *typename)
     return YES;
 }
 
+// write n-th data in Pasteboard to stdout
+BOOL
+readNthData(NSPasteboard *pbd, int n)
+{
+    NSArray *types = [pbd types];
+
+    if((n < 1) || ([types count] < n)){
+	return FALSE;
+    }
+
+    NSData *t = [pbd dataForType: [types objectAtIndex: n -1]];
+    if(t != nil){	// t should not be nil
+	int l = [t length];
+	void *d = (void *)[t bytes];
+	int c = 0;
+	while(l > 0){
+	    c = write(1, d, l>256?256:l);
+	    if(c>=0){
+		d += c;
+		l -= c;
+	    }else{
+		// write(2) failed
+		exit(-1);
+	    }
+	}
+    }
+    
+    return YES;
+}
 
 #ifndef NORTFD
 BOOL
