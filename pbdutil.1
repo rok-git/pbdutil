@@ -1,4 +1,4 @@
-.\" $Id: pbdutil.1,v 1.4 2010/05/16 05:11:15 rok Exp rok $
+.\" $Id: pbdutil.1,v 1.5 2018/05/01 08:00:26 rok Exp rok $
 .\"
 .Dd -
 .Dt PBDUTIL 1
@@ -12,13 +12,16 @@
 .Fl r Ar type
 .Nm
 .Op Fl n Ar name
-.Fl C Ar index
+.Fl R Ar index
 .Nm
 .Op Fl n Ar name
 .Fl w Ar type
 .Nm
 .Op Fl n Ar name
 .Fl l Op Fl v Op Fl v Op Fl v
+.Nm
+.Op Fl n Ar name
+.Fl -C
 .Nm
 .Op Fl n Ar name
 .Fl c
@@ -41,7 +44,7 @@ given name, one will be created.
 Read data from the Pasteboard and write them to stdout.  Available 
 .Ar types
 are text, rtf, rtfd, tiff, pict, pdf.
-.It Fl C Ar index
+.It Fl R Ar index
 Read n-th data from the Pasteboard and write them to stdout.  \fBindiex\fR is the
 number shown by "pbdutil -lvvv"
 .It Fl w Ar type
@@ -53,6 +56,8 @@ List contents of Pasteboard briefly.  More
 .Fl v
 make the result more specific.  "-lvvv" also shows index number that can
 be used with "-C index" option.
+.It Fl C
+Count contents of the Pasteboard
 .It Fl c 
 Clear content of pasteboard.
 .El
