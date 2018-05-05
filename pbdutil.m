@@ -2,7 +2,7 @@
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
 /* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.13 2011/04/24 11:51:23 rok Exp rok $ */
+/* $Id: pbdutil.m,v 1.14 2018/05/01 06:14:11 rok Exp $ */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -10,18 +10,12 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
-#define NORTFD
-
-//typedef enum {in, out} inout;
 void init();
 void usage();
 void listTypes(NSPasteboard *pbd, int verboseLevel);
 BOOL writeDataForType(NSPasteboard *pbd, char *typename);
 BOOL readDataForType(NSPasteboard *pbd, char *typename);
 BOOL readNthData(NSPasteboard *pbd, int n);
-#ifndef NORTFD
-BOOL readRTFD(NSPasteboard *pbd, char *path);
-#endif
 void pbdclear(NSPasteboard *pbd);
 void pbdcount(NSPasteboard *pbd, int verboseLevel);
 
@@ -30,10 +24,10 @@ NSDictionary *pbTypes;
 int
 main(int argc, char *argv[])
 {
+    @autoreleasepool{
     int verboseLevel = 0;
     char *typename = NULL;
     char *output = NULL;
-    NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
     NSPasteboard *pbd = nil;
     enum {get, set, list, help, clear, count, getNth, none} what = none;
     char sw;
@@ -93,17 +87,8 @@ main(int argc, char *argv[])
 	    usage();
 	    break;
 	case get:
-#ifndef NORTFD
-	    if(!strcmp(typename, "rtfd")){
-		if((output == NULL) || (readRTFD(pbd, output) != YES))
-			usage();
-	    }else{
-#endif
 		if(readDataForType(pbd, typename) != YES)
 		    usage();	// TYPE typename not exists
-#ifndef NORTFD
-	    }
-#endif
 	    break;
 	case set:
 	    if(writeDataForType(pbd, typename) != YES)
@@ -124,10 +109,10 @@ main(int argc, char *argv[])
 	    break;
     }
 
-    [arp release];
     if(typename)
 	free(typename);
     return 0;
+    } // @autoreleasepool
 }
 
 void
@@ -139,7 +124,6 @@ init()
 		NSStringPboardType,
 		NSTIFFPboardType,
 		NSPDFPboardType,
-		NSPICTPboardType,
 		NSHTMLPboardType,
 		NSRTFPboardType,
 		NSRTFDPboardType,
@@ -153,7 +137,6 @@ init()
 		@"text",
 		@"tiff",
 		@"pdf",
-		@"pict",
 		@"html",
 		@"rtf",
 		@"rtfd",
@@ -168,11 +151,7 @@ void usage()
 {
     NSEnumerator *ke = [pbTypes keyEnumerator];
     NSString *k;
-#ifndef NORTFD
-    printf("Usage:	pbdutil [-n name] [-r type|-r rtfd -o FILE|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
-#else
-    printf("Usage:	pbdutil [-n name] [-r type|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
-#endif
+    printf("Usage:	pbdutil [-n name] [-r type|-R index|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
     printf("	(supported types:");
     while((k = [ke nextObject]) != nil){
 	printf(" %s", [k UTF8String]);
@@ -276,19 +255,6 @@ readNthData(NSPasteboard *pbd, int n)
     
     return YES;
 }
-
-#ifndef NORTFD
-BOOL
-readRTFD(NSPasteboard *pbd, char *path){
-    NSString *type = [pbTypes objectForKey: @"rtfd"]; 
-    NSData *t = [pbd dataForType: type];
-    NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: t];
-    [fw autorelease];
-    return [fw writeToFile: [NSString stringWithUTF8String: path]
-	       atomically: YES
-	       updateFilenames: YES];
-}
-#endif
 
 
 // read data from stdin and write to Pasteboard
