@@ -1,8 +1,9 @@
-# $Id: Makefile,v 1.7 2010/05/16 03:15:52 rok Exp rok $
+# $Id: Makefile,v 1.8 2018/05/01 08:02:51 rok Exp $
 #CC = cc -framework Cocoa -g
 #CC = cc -framework Cocoa -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk
 #CC = cc -framework Cocoa -g -arch i386 -arch ppc -arch x86_64
-CC = cc -framework Cocoa -g -arch i386 -arch x86_64
+#CC = cc -framework Cocoa -g -arch i386 -arch x86_64
+CC = cc -framework Cocoa -arch i386 -arch x86_64
 CFLAGS = -Wall 
 INSTALLDIR = /usr/local
 MANDIR=$(INSTALLDIR)/share/man
@@ -31,3 +32,4 @@ tar:
 
 clean:
 	rm -f pbdutil.o mkfw.o *~ $(PROGRAMS)
+	rm -rf *.dSYM

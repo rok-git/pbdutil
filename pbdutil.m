@@ -302,12 +302,12 @@ pbdclear(NSPasteboard *pbd)
 	|| [nm isEqualToString: NSRulerPboard]
 	|| [nm isEqualToString: NSFindPboard]
 	|| [nm isEqualToString: NSDragPboard]){
-	(void)[pbd declareTypes: nil owner: nil];
+	(void)[pbd clearContents];
     }else{
 #if DEBUG > 1
 	NSLog(@"Clear Private Pasteboard: %s\n", [nm UTF8String]);
 #endif
-	(void)[pbd declareTypes: nil owner: nil];
+	(void)[pbd clearContents];
 	(void)[pbd releaseGlobally];
     }
     return;
