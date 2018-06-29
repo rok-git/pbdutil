@@ -27,7 +27,6 @@ main(int argc, char *argv[])
     @autoreleasepool{
     int verboseLevel = 0;
     char *typename = NULL;
-    char *output = NULL;
     NSPasteboard *pbd = nil;
     enum {get, set, list, help, clear, count, getNth, none} what = none;
     char sw;
@@ -69,9 +68,6 @@ main(int argc, char *argv[])
 		pbd = [NSPasteboard pasteboardWithName:
 			    [NSString stringWithUTF8String: optarg]];
 		break;
-	    case 'o':
-		output = strdup(optarg);
-		break;
 	    default:
 		break;
 	}
@@ -100,7 +96,7 @@ main(int argc, char *argv[])
 	case count:
 	    pbdcount(pbd, verboseLevel);
 	    break;
-	case getNth:		// NOT YET IMPLREMENTED
+	case getNth:
 	    readNthData(pbd, nth);
 	    break;
 	case list:		// Default Action
