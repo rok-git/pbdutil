@@ -4,7 +4,7 @@
 #CC = cc -framework Cocoa -g -arch i386 -arch ppc -arch x86_64
 #CC = cc -framework Cocoa -g -arch i386 -arch x86_64
 CC = cc -framework Cocoa -arch i386 -arch x86_64
-CFLAGS = -Wall 
+CFLAGS = -Wall -fobjc-arc
 INSTALLDIR = /usr/local
 MANDIR=$(INSTALLDIR)/share/man
 BINDIR=$(INSTALLDIR)/bin

@@ -11,58 +11,43 @@
 
 #define BUFFSIZE 256
 
-NSAutoreleasePool *arp;
-
-void
-initialize()
-{
-    arp = [[NSAutoreleasePool alloc] init];
-}
-
-void
-finalize()
-{
-    [arp release];
-}
 
 void
 usage(char *n)
 {
   printf("Usage: %s FILENAME\n", n);
-  finalize();
   exit(1);
 }
 
 int
 main(int argc, char *argv[])
 {
-  unsigned char buffer[BUFFSIZE];
-  size_t len;
-  int ret;
-  NSError *err;
+    @autoreleasepool{
 
-  initialize();
-  
-  if(argc != 2){
-    usage(argv[0]);
-  }
+	unsigned char buffer[BUFFSIZE];
+	size_t len;
+	int ret;
+	NSError *err;
 
-  NSMutableData *data = [[NSMutableData alloc] init];
+	if(argc != 2){
+	    usage(argv[0]);
+	}
 
-  while((len = read(0, buffer, BUFFSIZE))){
-    [data appendBytes: buffer length: len];
-  }
+	NSMutableData *data = [[NSMutableData alloc] init];
 
-  NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: data];
+	while((len = read(0, buffer, BUFFSIZE))){
+	    [data appendBytes: buffer length: len];
+	}
 
-  ret = [fw writeToURL: 
-	    [NSURL fileURLWithPath: [NSString stringWithUTF8String: argv[1]] isDirectory: NO] 
+	NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: data];
+
+	ret = [fw writeToURL: 
+	[NSURL fileURLWithPath: [NSString stringWithUTF8String: argv[1]] isDirectory: NO] 
 	    options: NSFileWrapperWritingAtomic | NSFileWrapperWritingWithNameUpdating
 	    originalContentsURL: nil
 	    error: &err]; 
-  [fw release];
-  [data release];
 
-  finalize();
-  return ret;
+    return ret;
+
+    }
 }
