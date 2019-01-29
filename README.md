@@ -79,7 +79,7 @@ rtf, rtfd, tiff, pict, pdf.</p>
 <i>index</i></p>
 
 <p style="margin-left:20%;">Read n-th data from the
-Pasteboard and write them to stdout. <b>indiex</b> is the
+Pasteboard and write them to stdout. <b>index</b> is the
 number shown by &quot;pbdutil -lvvv&quot;</p>
 
 <p style="margin-top: 1em" valign="top"><b>&minus;w</b>
@@ -95,7 +95,7 @@ match.</p>
 <p style="margin-left:20%;">List contents of Pasteboard
 briefly. More <b>&minus;v</b> make the result more specific.
 &quot;-lvvv&quot; also shows index number that can be used
-with &quot;-C index&quot; option.</p>
+with &quot;-R index&quot; option.</p>
 
 
 <p style="margin-top: 1em" valign="top"><b>&minus;C</b></p>
