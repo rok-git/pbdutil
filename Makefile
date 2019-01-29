@@ -1,7 +1,5 @@
 # $Id: Makefile,v 1.8 2018/05/01 08:02:51 rok Exp $
 #CC = cc -framework Cocoa -g
-#CC = cc -framework Cocoa -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk
-#CC = cc -framework Cocoa -g -arch i386 -arch ppc -arch x86_64
 #CC = cc -framework Cocoa -g -arch i386 -arch x86_64
 CC = cc -framework Cocoa -arch i386 -arch x86_64
 CFLAGS = -Wall -fobjc-arc
@@ -17,12 +15,18 @@ pbdutil:
 mkfw:
 
 install: $(PROGRAMS)
-	mkdir -p $(INSTALLDIR)/bin
+	mkdir -p $(BINDIR)
 	install -c -m 755 $(PROGRAMS) $(BINDIR)
 
 install-man:
 	mkdir -p $(MANDIR)/man$(MANSUFFIX)
 	install -c -m 644 pbdutil.$(MANSUFFIX) $(MANDIR)/man$(MANSUFFIX)
+
+install-compat:
+	if [ -x $(BINDIR)/pbdutil ]; then \
+		ln -s pbdutil $(BINDIR)/pbcopy; \
+		ln -s pbdutil $(BINDIR)/pbpaste; \
+	fi
 
 tar:
 	mkdir distfiles
