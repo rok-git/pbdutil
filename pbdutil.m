@@ -1,8 +1,7 @@
 /* pbdutil.m */
 /* Utility to read/write Pasteboard */
 /* written by rok (CHOI Kyong-Rok) */
-/* (C) 2003 by CHOI Kyong-Rok */
-/* $Id: pbdutil.m,v 1.14 2018/05/01 06:14:11 rok Exp $ */
+/* (C) by CHOI Kyong-Rok */
 
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
@@ -19,6 +18,8 @@ BOOL readNthData(NSPasteboard *pbd, int n);
 void pbdclear(NSPasteboard *pbd);
 void pbdcount(NSPasteboard *pbd, int verboseLevel);
 
+enum pbdmode {pbdutil, pbcopy, pbpaste};
+
 NSDictionary *pbTypes;
 
 int
@@ -29,51 +30,87 @@ main(int argc, char *argv[])
     char *typename = NULL;
     NSPasteboard *pbd = nil;
     enum {get, set, list, help, clear, count, getNth, none} what = none;
+    enum pbdmode pbdmode = pbdutil;
     char sw;
     int nth;
 
     init();	// setup pbTypes etc.
 
-    while((sw = getopt(argc, argv, "vcChlw:r:R:n:o:")) != -1){
-	switch(sw){
-	    case 'h':		// show help
-		what = help;
-		break;
-	    case 'l':		// list available types and information
-		what = list;
-		break;
-	    case 'w':		// write to pasteboard
+    NSString *cmd = [[NSString stringWithUTF8String: argv[0]] lastPathComponent];
+
+    if([cmd compare: @"pbcopy"] == NSOrderedSame){
+	pbdmode = pbcopy;
+    }else if([cmd compare: @"pbpaste"] == NSOrderedSame){
+	pbdmode = pbpaste;
+    }else{
+	pbdmode = pbdutil;
+    }
+
+    if((pbdmode == pbcopy) || (pbdmode == pbpaste)){
+	// pbcopy / pbpaste compatible mode
+	switch(pbdmode){
+	    case pbcopy:
 		what = set;
-		typename = strdup(optarg);
 		break;
-	    case 'r':		// read from pasteboard
+	    case pbpaste:
 		what = get;
-		typename = strdup(optarg);
 		break;
-	    case 'c':		// clear pasteboard
-		what = clear;
-		break;
-	    case 'C':		// count the types of contents
-		what = count;
-		break;
-	    case 'v':
-		verboseLevel += 1;
-		break;
-	    case 'R':		// read n-th data from pasteboard
-		// *** NOT YET IMPLEMENTED ***
-		what = getNth;
-		nth = atoi(optarg);
-		break;
-	    case 'n':
-		pbd = [NSPasteboard pasteboardWithName:
-			    [NSString stringWithUTF8String: optarg]];
-		break;
+	    case pbdutil:
 	    default:
+		// this must not happens
 		break;
 	}
+	NSUserDefaults *args = [[NSUserDefaults alloc] init];
+	if([args stringForKey: @"pboard"]){
+	    pbd = [NSPasteboard pasteboardWithName:
+		    [args stringForKey: @"pboard"]];
+	}
+	if([args stringForKey: @"Prefer"]){
+	    typename = (char *)[[args stringForKey: @"Prefer"] UTF8String];
+	}else{
+	    typename = "text";
+	}
+    }else{
+	while((sw = getopt(argc, argv, "vcChlw:r:R:n:o:")) != -1){
+	    switch(sw){
+		case 'h':		// show help
+		    what = help;
+		    break;
+		case 'l':		// list available types and information
+		    what = list;
+		    break;
+		case 'w':		// write to pasteboard
+		    what = set;
+		    typename = optarg;
+		    break;
+		case 'r':		// read from pasteboard
+		    what = get;
+		    typename = optarg;
+		    break;
+		case 'c':		// clear pasteboard
+		    what = clear;
+		    break;
+		case 'C':		// count the types of contents
+		    what = count;
+		    break;
+		case 'v':
+		    verboseLevel += 1;
+		    break;
+		case 'R':		// read n-th data from pasteboard
+		    what = getNth;
+		    nth = atoi(optarg);
+		    break;
+		case 'n':
+		    pbd = [NSPasteboard pasteboardWithName:
+				[NSString stringWithUTF8String: optarg]];
+		    break;
+		default:
+		    break;
+	    }
+	}
+	argc -= optind;
+	argv += optind;
     }
-    argc -= optind;
-    argv += optind;
 
     if(pbd == nil)
 	pbd  = [NSPasteboard generalPasteboard];
@@ -83,8 +120,8 @@ main(int argc, char *argv[])
 	    usage();
 	    break;
 	case get:
-		if(readDataForType(pbd, typename) != YES)
-		    usage();	// TYPE typename not exists
+	    if(readDataForType(pbd, typename) != YES)
+		usage();	// TYPE typename not exists
 	    break;
 	case set:
 	    if(writeDataForType(pbd, typename) != YES)
@@ -105,8 +142,6 @@ main(int argc, char *argv[])
 	    break;
     }
 
-    if(typename)
-	free(typename);
     return 0;
     } // @autoreleasepool
 }
@@ -117,6 +152,7 @@ init()
     pbTypes = [NSDictionary
 	dictionaryWithObjects:
 	    [NSArray arrayWithObjects: 
+		NSStringPboardType,
 		NSStringPboardType,
 		NSTIFFPboardType,
 		NSPDFPboardType,
@@ -131,6 +167,7 @@ init()
 	forKeys:
 	    [NSArray arrayWithObjects:
 		@"text",
+		@"txt",
 		@"tiff",
 		@"pdf",
 		@"html",
