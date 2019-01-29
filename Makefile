@@ -7,7 +7,7 @@ INSTALLDIR = /usr/local
 MANDIR=$(INSTALLDIR)/share/man
 BINDIR=$(INSTALLDIR)/bin
 MANSUFFIX = 1
-FILES = pbdutil.m mkfw.m Makefile pbdutil.1
+FILES = pbdutil.m mkfw.m Makefile pbdutil.$(MANSUFFIX)
 PROGRAMS = pbdutil mkfw
 
 all: $(PROGRAMS)
