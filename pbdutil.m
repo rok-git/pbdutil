@@ -120,8 +120,8 @@ main(int argc, char *argv[])
 	    usage();
 	    break;
 	case get:
-		if(readDataForType(pbd, typename) != YES)
-		    usage();	// TYPE typename not exists
+	    if(readDataForType(pbd, typename) != YES)
+		usage();	// TYPE typename not exists
 	    break;
 	case set:
 	    if(writeDataForType(pbd, typename) != YES)
