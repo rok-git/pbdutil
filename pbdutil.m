@@ -152,17 +152,18 @@ init()
     pbTypes = [NSDictionary
 	dictionaryWithObjects:
 	    [NSArray arrayWithObjects: 
-		NSStringPboardType,
-		NSStringPboardType,
-		NSTIFFPboardType,
-		NSPDFPboardType,
-		NSHTMLPboardType,
-		NSRTFPboardType,
-		NSRTFDPboardType,
-		NSTabularTextPboardType,
-		NSURLPboardType,
-		NSFilenamesPboardType,
-		NSFontPboardType,
+		NSPasteboardTypeString,
+		NSPasteboardTypeString,
+		NSPasteboardTypeTIFF,
+		NSPasteboardTypePDF,
+		NSPasteboardTypeHTML,
+		NSPasteboardTypePDF,
+		NSPasteboardTypeRTF,
+		NSPasteboardTypeTabularText,
+		NSPasteboardTypeURL,
+		// NSFilenamesPboardType,
+		NSPasteboardTypeFileURL,
+		NSPasteboardTypeFont,
 		nil]
 	forKeys:
 	    [NSArray arrayWithObjects:
@@ -330,11 +331,11 @@ void
 pbdclear(NSPasteboard *pbd)
 {
     NSString *nm = [pbd name];
-    if([nm isEqualToString: NSGeneralPboard]
-	|| [nm isEqualToString: NSFontPboard]
-	|| [nm isEqualToString: NSRulerPboard]
-	|| [nm isEqualToString: NSFindPboard]
-	|| [nm isEqualToString: NSDragPboard]){
+    if([nm isEqualToString: NSPasteboardNameGeneral]
+	|| [nm isEqualToString: NSPasteboardNameFont]
+	|| [nm isEqualToString: NSPasteboardNameRuler]
+	|| [nm isEqualToString: NSPasteboardNameFind]
+	|| [nm isEqualToString: NSPasteboardNameDrag]){
 	(void)[pbd clearContents];
     }else{
 #if DEBUG > 1

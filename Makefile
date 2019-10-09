@@ -1,7 +1,8 @@
 # $Id: Makefile,v 1.8 2018/05/01 08:02:51 rok Exp $
 #CC = cc -framework Cocoa -g
 #CC = cc -framework Cocoa -g -arch i386 -arch x86_64
-CC = cc -framework Cocoa -arch i386 -arch x86_64
+#CC = cc -framework Cocoa -arch i386 -arch x86_64
+CC = cc -framework Cocoa 
 CFLAGS = -Wall -fobjc-arc
 INSTALLDIR = /usr/local
 MANDIR=$(INSTALLDIR)/share/man
