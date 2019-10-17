@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 	    originalContentsURL: nil
 	    error: &err]; 
 
-    return ret;
+        return ret;
 
     }
 }
