@@ -149,47 +149,32 @@ main(int argc, char *argv[])
 void
 init()
 {
-    pbTypes = [NSDictionary
-	dictionaryWithObjects:
-	    [NSArray arrayWithObjects: 
-		NSPasteboardTypeString,
-		NSPasteboardTypeString,
-		NSPasteboardTypeTIFF,
-		NSPasteboardTypePDF,
-		NSPasteboardTypeHTML,
-		NSPasteboardTypeRTF,
-                NSPasteboardTypeRTFD,
-		NSPasteboardTypeTabularText,
-		NSPasteboardTypeURL,
-		// NSFilenamesPboardType,
-		NSPasteboardTypeFileURL,
-		NSPasteboardTypeFont,
-		nil]
-	forKeys:
-	    [NSArray arrayWithObjects:
-		@"text",
-		@"txt",
-		@"tiff",
-		@"pdf",
-		@"html",
-		@"rtf",
-		@"rtfd",
-		@"tab",
-		@"url",
-		@"path",
-		@"font",
-		nil]];
+    pbTypes =
+        @{
+            @"text": NSPasteboardTypeString,
+            @"txt": NSPasteboardTypeString,
+            @"tiff": NSPasteboardTypeTIFF,
+            @"pdf": NSPasteboardTypePDF,
+            @"html": NSPasteboardTypeHTML,
+            @"rtf": NSPasteboardTypeRTF,
+            @"rtfd": NSPasteboardTypeRTFD,
+            @"tab": NSPasteboardTypeTabularText,
+            @"url": NSPasteboardTypeURL,
+            @"path": NSPasteboardTypeFileURL,
+            @"font": NSPasteboardTypeFont
+        };
 }
 
 void usage()
 {
-    NSEnumerator *ke = [pbTypes keyEnumerator];
-    NSString *k;
     printf("Usage:	pbdutil [-n name] [-r type|-R index|-w type|-l[ -v[ -v[ -v]]]|-c]\n");
     printf("	(supported types:");
-    while((k = [ke nextObject]) != nil){
-	printf(" %s", [k UTF8String]);
-    }
+    // output order may be strange
+    [pbTypes enumerateKeysAndObjectsUsingBlock:
+        ^(NSString *k, NSString *obj, BOOL *stop){
+            printf(" %s", [k UTF8String]);
+        }
+    ];
     printf(")\n");
     printf("	pbdutil -C\n");
     exit(1);
@@ -198,30 +183,27 @@ void usage()
 void
 listTypes(NSPasteboard *pbd, int verboseLevel)
 {
-    NSString *t, *k;
-    NSEnumerator *ke;
+    NSString *t;
     NSArray *types = [pbd types];
-    NSEnumerator *en = [types objectEnumerator];
     int i = 1;
 
     printf("Available type(s):");
-    while((t = [en nextObject]) != nil){
-	ke = [pbTypes keyEnumerator];	// supported types
+    for(t in types){
 	if(verboseLevel <= 2){
-	    while((k = [ke nextObject]) != nil){
-		if([(NSString *)t isEqualToString: (NSString *)[pbTypes objectForKey: k]]){
+            [pbTypes enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop){
+                if([t isEqualToString: value]){
 		    if(verboseLevel <= 0){
-			printf("\t%s", (char *)[k UTF8String]);
+			printf("\t%s", (char *)[key UTF8String]);
 		    }else if(verboseLevel >= 1){
-			printf("\n\t%s (%s)", (char *)[k UTF8String],
+			printf("\n\t%s (%s)", (char *)[key UTF8String],
 				[t UTF8String]);
 			if(verboseLevel >= 2){
 			    printf(" (size: %lu bytes)",
 				(unsigned long)[[pbd dataForType: t] length]);
 			}
 		    }
-		}
-	    }
+                }
+            }];
 	}else{	// verboseLevel >= 3
 		// list all types including non-supported types
 	    printf("\n\t%2d: %s (size: %lu)", i++, [t UTF8String], (unsigned long)[[pbd dataForType: t] length]);
