@@ -2,7 +2,8 @@
 #CC = cc -framework Cocoa -g
 #CC = cc -framework Cocoa -g -arch i386 -arch x86_64
 #CC = cc -framework Cocoa -arch i386 -arch x86_64
-CC = cc -framework Cocoa 
+#CC = cc -framework Cocoa 
+CC = cc -framework Cocoa -arch x86_64 -arch arm64
 CFLAGS = -Wall -fobjc-arc
 INSTALLDIR = /usr/local
 MANDIR=$(INSTALLDIR)/share/man
@@ -27,6 +28,7 @@ install-compat:
 	if [ -x $(BINDIR)/pbdutil ]; then \
 		ln -s pbdutil $(BINDIR)/pbcopy; \
 		ln -s pbdutil $(BINDIR)/pbpaste; \
+		ln -s pbdutil $(BINDIR)/pbclear; \
 	fi
 
 tar:
