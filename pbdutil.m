@@ -18,7 +18,7 @@ BOOL readNthData(NSPasteboard *pbd, int n);
 void pbdclear(NSPasteboard *pbd);
 void pbdcount(NSPasteboard *pbd, int verboseLevel);
 
-enum pbdmode {pbdutil, pbcopy, pbpaste};
+enum pbdmode {pbdutil, pbcopy, pbpaste, pbclear};
 
 NSDictionary *pbTypes;
 
@@ -42,11 +42,13 @@ main(int argc, char *argv[])
 	pbdmode = pbcopy;
     }else if([cmd compare: @"pbpaste"] == NSOrderedSame){
 	pbdmode = pbpaste;
+    }else if([cmd compare: @"pbclear"] == NSOrderedSame){
+        pbdmode = pbclear;
     }else{
 	pbdmode = pbdutil;
     }
 
-    if((pbdmode == pbcopy) || (pbdmode == pbpaste)){
+    if((pbdmode == pbcopy) || (pbdmode == pbpaste) || (pbdmode == pbclear)){
 	// pbcopy / pbpaste compatible mode
 	switch(pbdmode){
 	    case pbcopy:
@@ -55,6 +57,9 @@ main(int argc, char *argv[])
 	    case pbpaste:
 		what = get;
 		break;
+            case pbclear:
+                what = clear;
+                break;
 	    case pbdutil:
 	    default:
 		// this must not happens
