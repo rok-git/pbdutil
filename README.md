@@ -1,7 +1,7 @@
 Sorry, this README is converted from man page using "groff -man -Thtml"
 
 <!-- Creator     : groff version 1.19.2 -->
-<!-- CreationDate: Tue May  1 23:50:01 2018 -->
+<!-- CreationDate: Fri Jan  7 10:29:52 2022 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -73,7 +73,8 @@ created.</p>
 
 <p style="margin-left:20%;">Read data from the Pasteboard
 and write them to stdout. Available <i>types</i> are text,
-rtf, rtfd, tiff, pict, pdf.</p>
+rtf, rtfd, tiff, png, pdf, html, etc. (Macinotsh PICT is no
+longer supported).</p>
 
 <p style="margin-top: 1em" valign="top"><b>&minus;R</b>
 <i>index</i></p>
@@ -106,7 +107,7 @@ of the Pasteboard</p>
 
 <p style="margin-top: 1em" valign="top"><b>&minus;c</b></p>
 
-<p style="margin-left:20%; margin-top: 1em">Clear content
+<p style="margin-left:20%; margin-top: 1em">Clear contents
 of pasteboard.</p>
 
 
@@ -161,7 +162,7 @@ clears the contents of the pasteboard.</p>
 <p style="margin-left:8%;">CHOI Kyong-Rok.</p>
 
 <p style="margin-left:8%; margin-top: 1em">Mac OS X
-May&nbsp;1, 2018 Mac OS X</p>
+January&nbsp;7, 2022 Mac OS X</p>
 <hr>
 </body>
 </html>
