@@ -17,6 +17,7 @@ BOOL readDataForType(NSPasteboard *pbd, char *typename);
 BOOL readNthData(NSPasteboard *pbd, int n);
 void pbdclear(NSPasteboard *pbd);
 void pbdcount(NSPasteboard *pbd, int verboseLevel);
+void destroyPasteboard(NSPasteboard *pbd);
 
 enum pbdmode {pbdutil, pbcopy, pbpaste, pbclear};
 
@@ -29,7 +30,7 @@ main(int argc, char *argv[])
     int verboseLevel = 0;
     char *typename = NULL;
     NSPasteboard *pbd = nil;
-    enum {get, set, list, help, clear, count, getNth, none} what = none;
+    enum {get, set, list, help, clear, count, getNth, destroy, none} what = none;
     enum pbdmode pbdmode = pbdutil;
     char sw;
     int nth;
@@ -76,7 +77,7 @@ main(int argc, char *argv[])
 	    typename = "text";
 	}
     }else{
-	while((sw = getopt(argc, argv, "vcChlw:r:R:n:o:")) != -1){
+	while((sw = getopt(argc, argv, "vcChlw:r:R:n:o:d")) != -1){
 	    switch(sw){
 		case 'h':		// show help
 		    what = help;
@@ -109,6 +110,9 @@ main(int argc, char *argv[])
 		    pbd = [NSPasteboard pasteboardWithName:
 				[NSString stringWithUTF8String: optarg]];
 		    break;
+                case 'd':
+                    what = destroy;
+                    break;
 		default:
 		    break;
 	    }
@@ -141,6 +145,9 @@ main(int argc, char *argv[])
 	case getNth:
 	    readNthData(pbd, nth);
 	    break;
+        case destroy:
+            destroyPasteboard(pbd);
+            break;
 	case list:		// Default Action
 	default:
 	    listTypes(pbd, verboseLevel);
@@ -183,6 +190,7 @@ void usage()
     ];
     printf(")\n");
     printf("	pbdutil -C\n");
+    printf("	pbdutil -n name -d\n");
     exit(1);
 }
 
@@ -342,4 +350,17 @@ pbdcount(NSPasteboard *pbd, int verboseLevel)
     if(verboseLevel > 0)
        printf(" types are available");	
     printf("\n");
+}
+
+void
+destroyPasteboard(NSPasteboard *pbd)
+{
+    if(pbd == [NSPasteboard generalPasteboard]){
+        fprintf(stderr, "You cannot destroy general (default) Pasteboard\n");
+        exit(1);
+    }
+    if(pbd){
+        [pbd releaseGlobally];
+    }
+    return;
 }

@@ -1,7 +1,7 @@
 Sorry, this README is converted from man page using "groff -man -Thtml"
 
 <!-- Creator     : groff version 1.19.2 -->
-<!-- CreationDate: Fri Jan  7 10:29:52 2022 -->
+<!-- CreationDate: Fri Jan  7 15:16:00 2022 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -44,8 +44,9 @@ pbdutil</b> [<b>&minus;n&nbsp;</b><i>name</i>]
 [<b>&minus;v</b>]]] <b><br>
 pbdutil</b> [<b>&minus;n&nbsp;</b><i>name</i>] <b>&minus;C
 <br>
-pbdutil</b> [<b>&minus;n&nbsp;</b><i>name</i>]
-<b>&minus;c</b></p>
+pbdutil</b> [<b>&minus;n&nbsp;</b><i>name</i>] <b>&minus;c
+<br>
+pbdutil &minus;n</b> <i>name</i> <b>&minus;d</b></p>
 
 
 <p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
@@ -108,7 +109,15 @@ of the Pasteboard</p>
 <p style="margin-top: 1em" valign="top"><b>&minus;c</b></p>
 
 <p style="margin-left:20%; margin-top: 1em">Clear contents
-of pasteboard.</p>
+of the pasteboard.</p>
+
+<p style="margin-top: 1em" valign="top"><b>&minus;n</b>
+<i>name</i> <b>&minus;d</b></p>
+
+<p style="margin-left:20%;">Release the resources of the
+named pasteboard. The name of the pasteboard must be
+specified as &quot;-n name&quot; and you cannot release the
+General (default) pasteboard.</p>
 
 
 <p style="margin-left:8%; margin-top: 1em"><b>&quot;mkfw&quot;</b>
@@ -141,17 +150,22 @@ TextEdit.app:</p>
 <p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
 
 <p style="margin-left:8%;">There is no way to know private
-pastebords&rsquo; names. More than one type of data cannot
-be stored into Pasteboard. For example, when you copy a page
-from Safari, then Pasteboard contains both text and rtf
-data. But you cannot store both text and rtf data using
-pbdutil. You can store only one type of data using
-pbdutil.</p>
+pastebords&rsquo; names.</p>
 
-<p style="margin-left:8%; margin-top: 1em">Private
-pasteboard created by issuing &rsquo;pbdutil -n name&rsquo;
-cannot be removed. &acute;pbdutil -n name -c&rsquo; only
-clears the contents of the pasteboard.</p>
+<p style="margin-left:8%; margin-top: 1em">More than one
+type of data cannot be stored into Pasteboard. For example,
+when you copy a page from Safari, then Pasteboard contains
+both text and rtf data. But you cannot store both text and
+rtf data using pbdutil. You can store only one type of data
+using pbdutil.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Now, private
+pasteboards created by issuing &quot;pbdutil -n name&quot;
+can be removed by using &quot;-d&quot; option with &quot;-n
+name&quot;. However, you have to rememer the names of
+pasteboards that you created with &quot;-n name&quot;
+because there is still no way to know the names of existing
+private pasteboards.</p>
 
 <p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
 

@@ -25,6 +25,9 @@
 .Nm
 .Op Fl n Ar name
 .Fl c
+.Nm
+.Fl n Ar name
+.Fl d
 .Sh DESCRIPTION
 The
 .Nm
@@ -59,7 +62,9 @@ be used with "-R index" option.
 .It Fl C
 Count contents of the Pasteboard
 .It Fl c 
-Clear contents of pasteboard.
+Clear contents of the pasteboard.
+.It Fl n Ar name Fl d
+Release the resources of the named pasteboard.  The name of the pasteboard must be specified as "-n name" and you cannot release the General (default) pasteboard.
 .El
 .Pp
 \fB"mkfw"\fR is a companion program that makes rtfd structured directory from the output of pbdutil.  If the Pasteboard contains data of RTFD type, you can use mkfw.
@@ -79,13 +84,13 @@ To make rtfd structured directory that can be opend with TextEdit.app:
 .Dl "pbdutil -r rtfd | mkfw FILE.rtfd"
 .Sh BUGS
 There is no way to know private pastebords' names.
+.Pp
 More than one type of data cannot be stored into Pasteboard.  For example,
 when you copy a page from Safari, then Pasteboard contains both text and rtf
 data.  But you cannot store both text and rtf data using pbdutil.  You can 
 store only one type of data using pbdutil. 
 .Pp
-Private pasteboard created by issuing 'pbdutil -n name' cannot be removed.
-\'pbdutil -n name -c' only clears the contents of the pasteboard.
+Now, private pasteboards created by issuing "pbdutil -n name" can be removed by using "-d" option with "-n name".  However, you have to rememer the names of pasteboards that you created with "-n name" because there is still no way to know the names of existing private pasteboards.
 .Sh SEE ALSO
 .Pp
 pbpaste(1), pbcopy(1)
