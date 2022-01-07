@@ -159,6 +159,7 @@ init()
             @"text": NSPasteboardTypeString,
             @"txt": NSPasteboardTypeString,
             @"tiff": NSPasteboardTypeTIFF,
+            @"png": NSPasteboardTypePNG,
             @"pdf": NSPasteboardTypePDF,
             @"html": NSPasteboardTypeHTML,
             @"rtf": NSPasteboardTypeRTF,
