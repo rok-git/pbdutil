@@ -16,6 +16,10 @@ all: $(PROGRAMS)
 pbdutil:
 mkfw:
 
+README.md:      pbdutil.1
+	@echo "Sorry, this README is converted from man page using \"groff -man -Thtml\"\n" > $@
+	groff -man -Thtml $^ >> $@
+
 install: $(PROGRAMS)
 	mkdir -p $(BINDIR)
 	install -c -m 755 $(PROGRAMS) $(BINDIR)
