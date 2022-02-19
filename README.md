@@ -1,7 +1,7 @@
 Sorry, this README is converted from man page using "groff -man -Thtml"
 
 <!-- Creator     : groff version 1.19.2 -->
-<!-- CreationDate: Fri Jan  7 15:16:00 2022 -->
+<!-- CreationDate: Sat Jan  8 16:12:59 2022 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -64,10 +64,10 @@ options are available:</p>
 <p style="margin-top: 1em" valign="top"><b>&minus;n</b>
 <i>name</i></p>
 
-<p style="margin-left:20%;">Use a private pasteboard named
-as <i>name</i> instead of general (standard) pasteboard. If
-there is no pasteboard with given name, one will be
-created.</p>
+<p style="margin-left:20%;">Use the private pasteboard
+named as <i>name</i> instead of the general (standard)
+pasteboard. If there is no pasteboards with given name, one
+will be created.</p>
 
 <p style="margin-top: 1em" valign="top"><b>&minus;r</b>
 <i>type</i></p>
@@ -81,7 +81,7 @@ longer supported).</p>
 <i>index</i></p>
 
 <p style="margin-left:20%;">Read n-th data from the
-Pasteboard and write them to stdout. <b>index</b> is the
+Pasteboard and write the data to stdout. <b>index</b> is the
 number shown by &quot;pbdutil -lvvv&quot;</p>
 
 <p style="margin-top: 1em" valign="top"><b>&minus;w</b>
@@ -176,7 +176,7 @@ private pasteboards.</p>
 <p style="margin-left:8%;">CHOI Kyong-Rok.</p>
 
 <p style="margin-left:8%; margin-top: 1em">Mac OS X
-January&nbsp;7, 2022 Mac OS X</p>
+January&nbsp;8, 2022 Mac OS X</p>
 <hr>
 </body>
 </html>
