@@ -201,6 +201,7 @@ listTypes(NSPasteboard *pbd, int verboseLevel)
     NSArray *types = [pbd types];
     int i = 1;
 
+    if([types count] == 0) return;
     printf("Available type(s):");
     for(t in types){
 	if(verboseLevel <= 2){
