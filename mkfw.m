@@ -25,7 +25,7 @@ main(int argc, char *argv[])
     @autoreleasepool{
 
 	unsigned char buffer[BUFFSIZE];
-	size_t len;
+	ssize_t len;
 	int ret;
 	NSError *err;
 
@@ -35,8 +35,13 @@ main(int argc, char *argv[])
 
 	NSMutableData *data = [[NSMutableData alloc] init];
 
-	while((len = read(0, buffer, BUFFSIZE))){
-	    [data appendBytes: buffer length: len];
+	while((len = read(0, buffer, BUFFSIZE)) > 0){
+	    [data appendBytes: buffer length: (NSUInteger)len];
+	}
+
+	if(len < 0){
+	    perror("read");
+	    return 1;
 	}
 
 	NSFileWrapper *fw = [[NSFileWrapper alloc] initWithSerializedRepresentation: data];
