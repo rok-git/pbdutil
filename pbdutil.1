@@ -31,10 +31,10 @@
 .Sh DESCRIPTION
 The
 .Nm
-read and write content of the Pasteboard.  When reading from the Pasteboard,
+read and write content of the pasteboard.  When reading from the pasteboard,
 content of specified type is written on stdout.  When writing
 Pasteboard, data should be given via stdin.  It also displays information
-about what the Pasteboard contains.
+about what the pasteboard contains.
 .Pp
 Following options are available:
 .Bl -tag -width Ds
@@ -44,15 +44,15 @@ Use the private pasteboard named as
 instead of the general (standard) pasteboard.  If there is no pasteboards with 
 given name, one will be created.
 .It Fl r Ar type
-Read data from the Pasteboard and write them to stdout.  Available 
+Read data from the pasteboard and write them to stdout.  Available 
 .Ar types
-are text, rtf, rtfd, tiff, png, pdf, html, etc. (Macinotsh PICT is no longer supported).
+are text, rtf, rtfd, tiff, png, pdf, html, etc. (Macintosh PICT is no longer supported).
 .It Fl R Ar index
-Read n-th data from the Pasteboard and write the data to stdout.  \fBindex\fR is the
+Read n-th data from the pasteboard and write the data to stdout.  .Ar index is the
 number shown by "pbdutil -lvvv"
 .It Fl w Ar type
 Read data from stdin and write them out to Pasteboard.  
-.Ar Type
+.Ar type
 and the data must match.
 .It Fl l Op Fl v Op Fl v Op Fl v
 List contents of Pasteboard briefly.  More 
@@ -60,39 +60,40 @@ List contents of Pasteboard briefly.  More
 make the result more specific.  "-lvvv" also shows index number that can
 be used with "-R index" option.
 .It Fl C
-Count contents of the Pasteboard
+Count contents of the pasteboard
 .It Fl c 
 Clear contents of the pasteboard.
 .It Fl n Ar name Fl d
 Release the resources of the named pasteboard.  The name of the pasteboard must be specified as "-n name" and you cannot release the General (default) pasteboard.
 .El
 .Pp
-\fB"mkfw"\fR is a companion program that makes rtfd structured directory from the output of pbdutil.  If the Pasteboard contains data of RTFD type, you can use mkfw.
+.Sy mkfw is a companion program that makes rtfd structured directory from the output of pbdutil.  If the pasteboard contains data of RTFD type, you can use mkfw.
 .\" .Sh IMPLEMENTATION NOTES
 .Sh EXAMPLES
 To read and write data in Pasteboard: 
 .Pp
 .Dl "pbdutil -r tiff > /tmp/a.tiff"
-.Dl "pabutil -w text < /etc/hosts
+.Dl "pbdutil -w text < /etc/hosts"
 .Pp
-To clear data in the Pasteboard:
+To clear data in the pasteboard:
 .Pp
 .Dl "pbdutil -c"
 .Pp
-To make rtfd structured directory that can be opend with TextEdit.app:
+To make rtfd structured directory that can be opened with TextEdit.app:
 .Pp
 .Dl "pbdutil -r rtfd | mkfw FILE.rtfd"
 .Sh BUGS
-There is no way to know private pastebords' names.
+There is no way to know private pasteboards' names.
 .Pp
 More than one type of data cannot be stored into Pasteboard.  For example,
 when you copy a page from Safari, then Pasteboard contains both text and rtf
 data.  But you cannot store both text and rtf data using pbdutil.  You can 
 store only one type of data using pbdutil. 
 .Pp
-Now, private pasteboards created by issuing "pbdutil -n name" can be removed by using "-d" option with "-n name".  However, you have to rememer the names of pasteboards that you created with "-n name" because there is still no way to know the names of existing private pasteboards.
+Now, private pasteboards created by issuing "pbdutil -n name" can be removed by using "-d" option with "-n name".  However, you have to remember the names of pasteboards that you created with "-n name" because there is still no way to know the names of existing private pasteboards.
 .Sh SEE ALSO
 .Pp
-pbpaste(1), pbcopy(1)
+.Xr pbpaste 1 ,
+.Xr pbcopy 1
 .Sh AUTHOR
 CHOI Kyong-Rok.
